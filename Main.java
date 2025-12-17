@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.Scanner;
 import java.io.*;
 import java.util.*;
+import java.util.Random;
 
 public class Main {
     static final int MONTHS = 12;
@@ -79,15 +80,56 @@ public class Main {
     }
 
     public static int totalProfitOnDay(int month, int day) {
-        return 1234;
+        int totalProfit = 0;
+        if(0>month || 11<month || 1>day || 28<day){
+            return -99999;
+        }
+        for(int i = 0; i<COMMS;i++){
+                totalProfit += profits[month][day-1][i];
+        }
+        return totalProfit;
     }
 
     public static int commodityProfitInRange(String commodity, int from, int to) {
-        return 1234;
+        Random rn = new Random();
+        Boolean isComm = false ;
+        int comNumber = 0;
+        for(int i = 0; i<COMMS; i++){
+            if( commodities[i] == commodity){
+                isComm=true;
+                comNumber = i;
+            }
+        }
+        if(from>to || from>28 || from<1 || to>28 || to<1 || isComm==false){
+            return -99999;
+        }
+
+        int profitinrange= 0;
+        for(int i = from-1; i<=to-1; i++){
+            profitinrange += profits[rn.nextInt(11)][i][comNumber];
+        }
+        return profitinrange;
     }
 
     public static int bestDayOfMonth(int month) {
-        return 1234;
+        if(month<0 || month>11){
+            return -1;
+        }
+        int[] dayProfit = new int[DAYS];
+        for(int i = 0; i<DAYS; i++){
+            for(int j = 0; j<COMMS; j++) {
+                dayProfit[i] += profits[month][i][j];
+            }
+        }
+        int most = dayProfit[0];
+        int dayNumber = 0;
+        for (int i = 0; i<dayProfit.length; i++){
+            if(most<dayProfit[i]){
+                most = dayProfit[i];
+                dayNumber = i + 1;
+            }
+        }
+        return dayNumber;
     }
 
     public static String bestMonthForCommodity(String comm) {
@@ -119,5 +161,11 @@ public class Main {
         System.out.println("Data loaded – ready for queries");
         String a = mostProfitableCommodityInMonth(0);
         System.out.println(a);
+        int b = totalProfitOnDay(0,1);
+        System.out.println(b);
+        int c = commodityProfitInRange("Gold", 1, 1);
+        System.out.println(c);
+        int d = bestDayOfMonth(0);
+        System.out.println(d);
     }
 }
