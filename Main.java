@@ -3,11 +3,13 @@
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.rmi.MarshalledObject;
 import java.util.*;
 import java.util.Scanner;
 import java.io.*;
 import java.util.*;
 import java.util.Random;
+import java.util.jar.JarEntry;
 
 public class Main {
     static final int MONTHS = 12;
@@ -49,7 +51,7 @@ public class Main {
     // ======== 10 REQUIRED METHODS (Students fill these) ========
 
     public static String mostProfitableCommodityInMonth(int month) {
-        if(month <=11 && month >=0) {
+        if (month <= 11 && month >= 0) {
             int gold = 0;
             int oil = 0;
             int silver = 0;
@@ -73,58 +75,57 @@ public class Main {
             }
             String returnstring = maxProfitCom + ", " + (Integer.toString(most));
             return returnstring;
-        }
-        else{
+        } else {
             return "INVALID_MONTH";
         }
     }
 
     public static int totalProfitOnDay(int month, int day) {
         int totalProfit = 0;
-        if(0>month || 11<month || 1>day || 28<day){
+        if (0 > month || 11 < month || 1 > day || 28 < day) {
             return -99999;
         }
-        for(int i = 0; i<COMMS;i++){
-                totalProfit += profits[month][day-1][i];
+        for (int i = 0; i < COMMS; i++) {
+            totalProfit += profits[month][day - 1][i];
         }
         return totalProfit;
     }
 
     public static int commodityProfitInRange(String commodity, int from, int to) {
         Random rn = new Random();
-        Boolean isComm = false ;
+        Boolean isComm = false;
         int comNumber = 0;
-        for(int i = 0; i<COMMS; i++){
-            if( commodities[i] == commodity){
-                isComm=true;
+        for (int i = 0; i < COMMS; i++) {
+            if (commodities[i] == commodity) {
+                isComm = true;
                 comNumber = i;
             }
         }
-        if(from>to || from>28 || from<1 || to>28 || to<1 || isComm==false){
+        if (from > to || from > 28 || from < 1 || to > 28 || to < 1 || isComm == false) {
             return -99999;
         }
 
-        int profitinrange= 0;
-        for(int i = from-1; i<=to-1; i++){
+        int profitinrange = 0;
+        for (int i = from - 1; i <= to - 1; i++) {
             profitinrange += profits[rn.nextInt(11)][i][comNumber];
         }
         return profitinrange;
     }
 
     public static int bestDayOfMonth(int month) {
-        if(month<0 || month>11){
+        if (month < 0 || month > 11) {
             return -1;
         }
         int[] dayProfit = new int[DAYS];
-        for(int i = 0; i<DAYS; i++){
-            for(int j = 0; j<COMMS; j++) {
+        for (int i = 0; i < DAYS; i++) {
+            for (int j = 0; j < COMMS; j++) {
                 dayProfit[i] += profits[month][i][j];
             }
         }
         int most = dayProfit[0];
         int dayNumber = 0;
-        for (int i = 0; i<dayProfit.length; i++){
-            if(most<dayProfit[i]){
+        for (int i = 0; i < dayProfit.length; i++) {
+            if (most < dayProfit[i]) {
                 most = dayProfit[i];
                 dayNumber = i + 1;
             }
@@ -133,11 +134,60 @@ public class Main {
     }
 
     public static String bestMonthForCommodity(String comm) {
-        return "DUMMY";
+        Boolean isComm = false;
+        int comNumber = 0;
+        for (int i = 0; i < COMMS; i++) {
+            if (commodities[i] == comm) {
+                isComm = true;
+                comNumber = i;
+            }
+        }
+        int[] allMonths = new int[MONTHS];
+        if (isComm == false) {
+            return "INVALID_COMMODITY";
+        }
+        for (int i = 0; i < MONTHS; i++) {
+            for (int j = 0; j < DAYS; j++) {
+                allMonths[i] = profits[i][j][comNumber];
+            }
+        }
+        int mostMonth = allMonths[0];
+        String monthNumber = months[0];
+        for(int i = 0; i<months.length; i++)
+            if (mostMonth<allMonths[i]){
+                mostMonth = allMonths[i];
+                monthNumber = months[i];
+            }
+        return monthNumber;
     }
 
     public static int consecutiveLossDays(String comm) {
-        return 1234;
+        Boolean isComm = false;
+        int comNumber = 0;
+        for (int i = 0; i < COMMS; i++) {
+            if (commodities[i] == comm) {
+                isComm = true;
+                comNumber = i;
+            }
+        }
+        if(isComm == false){
+            return -1;
+        }
+        int maxStreak = 0;
+        int currentStreak = 0;
+        for (int i = 0; i < MONTHS; i++) {
+            for (int j = 0; j < DAYS; j++) {
+                if (profits[i][j][comNumber] < 0) {
+                    currentStreak++;
+                    if (currentStreak > maxStreak) {
+                        maxStreak = currentStreak;
+                    }
+                }else {
+                    currentStreak = 0;
+                }
+            }
+        }
+        return maxStreak;
     }
 
     public static int daysAboveThreshold(String comm, int threshold) {
@@ -161,11 +211,15 @@ public class Main {
         System.out.println("Data loaded – ready for queries");
         String a = mostProfitableCommodityInMonth(0);
         System.out.println(a);
-        int b = totalProfitOnDay(0,1);
+        int b = totalProfitOnDay(0, 1);
         System.out.println(b);
         int c = commodityProfitInRange("Gold", 1, 1);
         System.out.println(c);
         int d = bestDayOfMonth(0);
         System.out.println(d);
+        String e = bestMonthForCommodity("Gold");
+        System.out.println(e);
+        int f = consecutiveLossDays("Gold");
+        System.out.println(f);
     }
 }
