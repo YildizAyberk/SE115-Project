@@ -191,11 +191,49 @@ public class Main {
     }
 
     public static int daysAboveThreshold(String comm, int threshold) {
-        return 1234;
+        Boolean isComm = false;
+        int comNumber = 0;
+        for (int i = 0; i < COMMS; i++) {
+            if (commodities[i] == comm) {
+                isComm = true;
+                comNumber = i;
+            }
+        }
+        if(isComm == false){
+            return -1;
+        }
+        int moreThreshold = 0;
+        for(int i = 0; i<MONTHS; i++){
+            for(int j = 0; j<DAYS; j++){
+                if (profits[i][j][comNumber]>threshold){
+                    moreThreshold++;
+                }
+            }
+        }
+        return moreThreshold;
     }
 
     public static int biggestDailySwing(int month) {
-        return 1234;
+        if(month<0 || month>11){
+            return -99999;
+        }
+        int[] dayProfit = new int[DAYS];
+        for(int i = 0; i<DAYS; i++){
+            for(int j = 0; j<COMMS; j++){
+                dayProfit[i] += profits[month][i][j];
+            }
+        }
+        int maxSwing = 0;
+        for (int i = 1; i < DAYS; i++) {
+            int diff = dayProfit[i] - dayProfit[i - 1];
+            if (diff < 0) {
+                diff = diff * -1;
+            }
+            if (diff > maxSwing) {
+                maxSwing = diff;
+            }
+        }
+        return maxSwing;
     }
 
     public static String compareTwoCommodities(String c1, String c2) {
@@ -221,5 +259,9 @@ public class Main {
         System.out.println(e);
         int f = consecutiveLossDays("Gold");
         System.out.println(f);
+        int g = daysAboveThreshold("Gold" , 0);
+        System.out.println(g);
+        int h = biggestDailySwing(0);
+        System.out.println(h);
     }
 }
