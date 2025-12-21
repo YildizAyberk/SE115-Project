@@ -1,15 +1,8 @@
 // Main.java — Students version
 
 import java.io.*;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.rmi.MarshalledObject;
-import java.util.*;
 import java.util.Scanner;
-import java.io.*;
-import java.util.*;
-import java.util.Random;
-import java.util.jar.JarEntry;
 
 public class Main {
     static final int MONTHS = 12;
@@ -73,7 +66,7 @@ public class Main {
                     maxProfitCom = commodities[i];
                 }
             }
-            String returnstring = maxProfitCom + ", " + (Integer.toString(most));
+            String returnstring = maxProfitCom + " " + (Integer.toString(most));
             return returnstring;
         } else {
             return "INVALID_MONTH";
@@ -92,7 +85,6 @@ public class Main {
     }
 
     public static int commodityProfitInRange(String commodity, int from, int to) {
-        Random rn = new Random();
         Boolean isComm = false;
         int comNumber = 0;
         for (int i = 0; i < COMMS; i++) {
@@ -106,8 +98,10 @@ public class Main {
         }
 
         int profitinrange = 0;
-        for (int i = from - 1; i <= to - 1; i++) {
-            profitinrange += profits[rn.nextInt(11)][i][comNumber];
+        for(int j = 0; j<MONTHS; j++) {
+            for (int i = from - 1; i <= to - 1; i++) {
+                profitinrange += profits[j][i][comNumber];
+            }
         }
         return profitinrange;
     }
@@ -148,7 +142,7 @@ public class Main {
         }
         for (int i = 0; i < MONTHS; i++) {
             for (int j = 0; j < DAYS; j++) {
-                allMonths[i] = profits[i][j][comNumber];
+                allMonths[i] += profits[i][j][comNumber];
             }
         }
         int mostMonth = allMonths[0];
@@ -237,11 +231,63 @@ public class Main {
     }
 
     public static String compareTwoCommodities(String c1, String c2) {
-        return "DUMMY is better by 1234";
+        int c1No = -1;
+        int c2No = -1;
+        for (int i = 0; i < commodities.length; i++) {
+            if (commodities[i] == c1) {
+                c1No = i;
+            }
+            if (commodities[i] == c2) {
+                c2No = i;
+            }
+        }
+        if (c1No == -1 || c2No == -1) {
+            return "INVALID_COMMODITY";
+        }
+        int totalProfit1 = 0;
+        int totalProfit2 = 0;
+        for (int i = 0; i < MONTHS; i++) {
+            for (int j = 0; j < DAYS; j++) {
+                totalProfit1 += profits[i][j][c1No];
+                totalProfit2 += profits[i][j][c2No];
+            }
+        }
+        if (totalProfit1 > totalProfit2) {
+            int diff = totalProfit1 - totalProfit2;
+            return c1 + " is better by " + diff;
+        } else if (totalProfit2 > totalProfit1) {
+            int diff = totalProfit2 - totalProfit1;
+            return c2 + " is better by " + diff;
+        } else {
+            return "Equal";
+        }
     }
 
     public static String bestWeekOfMonth(int month) {
-        return "DUMMY";
+        if(month<0 || month>11){
+            return "INVALID_MONTH";
+        }
+        int[] weekProfits = new int[4];
+        for (int week = 0; week < 4; week++) {
+            int startDay = week * 7;
+            int endDay = startDay + 7;
+            int currentWeekTotal = 0;
+            for (int day = startDay; day < endDay; day++) {
+                for (int comm = 0; comm < COMMS; comm++) {
+                    currentWeekTotal += profits[month][day][comm];
+                }
+            }
+            weekProfits[week] = currentWeekTotal;
+        }
+        int maxProfit = weekProfits[0];
+        int bestWeek = 0;
+        for (int i = 1; i < 4; i++) {
+            if (weekProfits[i] > maxProfit) {
+                maxProfit = weekProfits[i];
+                bestWeek = i;
+            }
+        }
+        return "Week " + (bestWeek + 1);
     }
 
     public static void main(String[] args) {
@@ -263,5 +309,9 @@ public class Main {
         System.out.println(g);
         int h = biggestDailySwing(0);
         System.out.println(h);
+        String i = compareTwoCommodities("Copper" , "Gold");
+        System.out.println(i);
+        String k = bestWeekOfMonth(0);
+        System.out.println(k);
     }
 }
